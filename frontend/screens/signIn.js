@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, Image, SafeAreaView } from 'react-native';
+import { View, TextInput, Button, Text, StyleSheet, Image, SafeAreaView, TouchableOpacity } from 'react-native';
 import { auth } from '../config/firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import styles from '../styles/signInPageStyles';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -27,7 +28,7 @@ export default function SignIn() {
         style={styles.logo}
         resizeMode="contain"
       />
-
+      <Text style={styles.titletext}>Login to your Account</Text>
       <TextInput
         style={[
           styles.input,
@@ -55,41 +56,13 @@ export default function SignIn() {
         onBlur={() => setPasswordFocused(false)}
       />
 
-      <View style={styles.buttonContainer}>
-        <Button title="Sign In" onPress={signIn} color="#6FB513" />
-      </View>
+      <TouchableOpacity style={styles.loginbtn} onPress={signIn}>
+        <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
+      <Text>Don't have an account? <Text style={{ color: '#6FB513' }}>Sign Up</Text></Text>
 
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 80,
-    paddingHorizontal: 30,
-    alignItems: 'center',
-  },
-  logo: {
-    width: 120,
-    height: 120,
-    marginBottom: 40,
-  },
-  input: {
-    width: '100%',
-    height: 50,
-    borderBottomWidth: 2,
-    paddingHorizontal: 5,
-    fontSize: 16,
-    marginBottom: 25,
-  },
-  buttonContainer: {
-    marginTop: 10,
-    marginBottom: 20,
-    width: '100%',
-  },
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
-  },
-});
