@@ -29,30 +29,47 @@ export default function SignIn({ navigation }) {
       // Sign in the user
       await signInUser(email, password);
       console.log('User signed in!!');
-
-      // Check if the user has a PIN set by querying Firestore
-      const userDoc = await getDoc(doc(firestore, 'user', email));
-      
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        const hasPin = userData.Pin; // Assuming 'pin' field exists in user document
-
-        if (hasPin) {
-          // If user has a PIN, navigate to HomePage
-          navigation.navigate('HomePage');
+  
+      // Show the modal first (immediately)
+      setModalMessage('Login Successful! 🎉');
+      setIsSuccess(true);
+      setModalVisible(true);
+  
+      // Wait for 2 seconds to show the modal before navigating
+      setTimeout(async () => {
+        // Check if the user has a PIN set by querying Firestore
+        const userDoc = await getDoc(doc(firestore, 'user', email));
+  
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const hasPin = userData.Pin; // Assuming 'Pin' field exists in user document
+  
+          // Navigate based on PIN status
+          if (hasPin) {
+            // If user has a PIN, navigate to HomePage
+            navigation.navigate('HomePage');
+          } else {
+            // If user does not have a PIN, navigate to PinSetup
+            navigation.navigate('PinSetup');
+          }
         } else {
-          // If user does not have a PIN, navigate to PinSetup
-          navigation.navigate('PinSetup');
+          console.error('User not found in Firestore.');
+          setModalMessage('User not found.');
+          setIsSuccess(false);
+          setModalVisible(true);
         }
-      } else {
-        console.error('User not found in Firestore.');
-        setErrorMessage('User not found.');
-      }
+      }, 2000); // 2 seconds delay before checking Firestore and navigating
     } catch (error) {
       console.error('Error signing in:', error.message);
       setErrorMessage(error.message);
+      setModalMessage(error.message);
+      setIsSuccess(false);
+      setModalVisible(true);
     }
   };
+  
+  
+  
 
   return (
     <SafeAreaView style={styles.innerContainer}>
