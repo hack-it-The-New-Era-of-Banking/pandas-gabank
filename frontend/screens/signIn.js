@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, Image, SafeAreaView } from 'react-native';
+import { View, TextInput, Button, Text, StyleSheet, Image, SafeAreaView, TouchableOpacity } from 'react-native';
 import { auth } from '../config/firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
@@ -27,7 +27,7 @@ export default function SignIn() {
         style={styles.logo}
         resizeMode="contain"
       />
-
+      <Text style={styles.titletext}>Login to your Account</Text>
       <TextInput
         style={[
           styles.input,
@@ -55,9 +55,10 @@ export default function SignIn() {
         onBlur={() => setPasswordFocused(false)}
       />
 
-      <View style={styles.buttonContainer}>
-        <Button title="Sign In" onPress={signIn} color="#6FB513" />
-      </View>
+      <TouchableOpacity style={styles.loginbtn} onPress={signIn}>
+        <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
+      <Text>Don't have an account? <Text>Sign Up</Text></Text>
 
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
     </SafeAreaView>
@@ -66,10 +67,19 @@ export default function SignIn() {
 
 const styles = StyleSheet.create({
   container: {
+    alignSelf: 'center',
+    width: '80%',
     marginTop: 80,
     paddingHorizontal: 30,
     alignItems: 'center',
   },
+  titletext: {
+    fontSize: 21,
+    fontWeight: '800',
+    marginBottom: 20,
+    color: '403D3D',
+  },
+
   logo: {
     width: 120,
     height: 120,
@@ -83,13 +93,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 25,
   },
-  buttonContainer: {
-    marginTop: 10,
-    marginBottom: 20,
-    width: '100%',
-  },
   errorText: {
     color: 'red',
     textAlign: 'center',
+  },
+  loginbtn: {
+    marginTop: 240,
+    backgroundColor: '#6FB513',
+    paddingVertical: 12,
+    paddingHorizontal: 77,
+    borderRadius: 10,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
