@@ -1,1 +1,1 @@
-export const geminiApiKey = process.env.GEMINI_API_KEY
+export const geminiApiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY
