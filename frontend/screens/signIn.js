@@ -27,6 +27,13 @@ export default function SignIn({ navigation }) {
       setModalMessage('Login Successful! 🎉');
       setIsSuccess(true);
       setModalVisible(true);
+
+      setTimeout(() => {
+        setModalVisible(false);
+        navigation.navigate('SplashPage');
+      }, 2000);
+      await signInUser(email, password);
+
       console.log('User signed in!!');
       navigation.navigate('PinSetup');
 
