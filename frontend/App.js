@@ -13,22 +13,24 @@ import HomePage from './screens/homePage';
 import GeminiTest from './screens/geminiTest';
 import PinSetup from './screens/pinSetup';
 import ConfirmPinSetup from './screens/confirmPinSetup';
-
+import DreamScreen from './screens/dreamScreen';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="SplashPage">
+      <Stack.Navigator initialRouteName="DreamScreen">
         <Stack.Screen name="SplashPage" component={SplashPage} options={{ headerShown: false }} />
         <Stack.Screen name="LandingPage" component={LandingPage} options={{ headerShown: false }} />
         <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }}/>
         <Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }}/>
         <Stack.Screen name="HomePage" component={HomePage} options={{ headerShown: false }} />
-        <Stack.Screen name="GeminiTest" component={GeminiTest} /> 
         <Stack.Screen name="PinSetup" component={PinSetup} options={{ headerShown: false }} />
         <Stack.Screen name="ConfirmPinSetup" component={ConfirmPinSetup} options={{ headerShown: false }} />
+
+        <Stack.Screen name="GeminiTest" component={GeminiTest} /> 
+        <Stack.Screen name="DreamScreen" component={DreamScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
