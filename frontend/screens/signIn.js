@@ -8,8 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import styles from '../styles/signInPageStyles';
-
-import { signInUser } from '../backend/userController'; // ✅ your auth service
+import { signInUser } from '../backend/userController';
 
 export default function SignIn({ navigation }) {
   const [email, setEmail] = useState('');
@@ -23,7 +22,7 @@ export default function SignIn({ navigation }) {
     try {
       await signInUser(email, password); // ✅ now using the service
       console.log('User signed in!!');
-      navigation.navigate('SplashPage');
+      navigation.navigate('PinSetup');
     } catch (error) {
       setErrorMessage(error.message);
     }

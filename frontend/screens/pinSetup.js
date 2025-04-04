@@ -1,18 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Image } from 'react-native';
+import { auth } from '../config/firebaseConfig';
+import { updatePin } from '../backend/userController'; 
 
-export default function PinSetup() {
+export default function PinSetup({ navigation }) {
   const [pin, setPin] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      setUserEmail(user.email);
+    } else {
+      console.log('❌ No user is signed in');
+    }
+  }, []);
 
   const handlePress = (num) => {
     if (pin.length < 6) {
-      setPin(pin + num);
+      const newPin = pin + num;
+      setPin(newPin);
+
+      if (newPin.length === 6) {
+        savePin(newPin);
+      }
     }
   };
 
   const handleDelete = () => {
     if (pin.length > 0) {
       setPin(pin.slice(0, -1));
+    }
+  };
+
+  const savePin = async (newPin) => {
+    try {
+      if (userEmail) {
+        await updatePin(userEmail, newPin);
+        console.log('✅ PIN saved successfully!');
+        navigation.navigate('HomePage');
+      } else {
+        console.error('❌ User email is not available.');
+      }
+    } catch (error) {
+      console.error('❌ Error saving PIN:', error.message);
     }
   };
 
