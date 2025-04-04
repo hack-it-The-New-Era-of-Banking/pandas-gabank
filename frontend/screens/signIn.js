@@ -7,6 +7,9 @@ import {
   Image,
   SafeAreaView,
   TouchableOpacity,
+  Modal,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import styles from '../styles/signUpPageStyles';
 import { signInUser } from '../backend/userController'; // Assuming this is your sign-in service
@@ -16,10 +19,10 @@ import { firestore } from '../config/firebaseConfig'; // Assuming firestore is y
 export default function SignIn({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const [emailFocused, setEmailFocused] = useState(false);
-  const [passwordFocused, setPasswordFocused] = useState(false);
+  const [focusField, setFocusField] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const signIn = async () => {
     try {
@@ -52,52 +55,81 @@ export default function SignIn({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Image
-        source={require('../assets/gabanklogo.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
-      <Text style={styles.titletext}>Login to your Account</Text>
+    <SafeAreaView style={styles.innerContainer}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      
+        <Image
+          source={require('../assets/gabanklogo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Text style={styles.titletext}>Login to your Account</Text>
 
-      <TextInput
-        style={[
-          styles.input,
-          { borderBottomColor: emailFocused ? '#6FB513' : '#ccc' },
-        ]}
-        placeholder="Email"
-        onChangeText={setEmail}
-        value={email}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        onFocus={() => setEmailFocused(true)}
-        onBlur={() => setEmailFocused(false)}
-      />
+        {/* Email Input */}
+        <TextInput
+          style={[
+            styles.input,
+            { borderBottomColor: focusField === 'email' ? '#6FB513' : '#ccc' },
+          ]}
+          placeholder="Email"
+          onChangeText={setEmail}
+          value={email}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          onFocus={() => setFocusField('email')}
+          onBlur={() => setFocusField('')}
+        />
 
-      <TextInput
-        style={[
-          styles.input,
-          { borderBottomColor: passwordFocused ? '#6FB513' : '#ccc' },
-        ]}
-        placeholder="Password"
-        onChangeText={setPassword}
-        secureTextEntry
-        value={password}
-        onFocus={() => setPasswordFocused(true)}
-        onBlur={() => setPasswordFocused(false)}
-      />
+        {/* Password Input */}
+        <TextInput
+          style={[
+            styles.input,
+            { borderBottomColor: focusField === 'password' ? '#6FB513' : '#ccc' },
+          ]}
+          placeholder="Password"
+          onChangeText={setPassword}
+          secureTextEntry
+          value={password}
+          onFocus={() => setFocusField('password')}
+          onBlur={() => setFocusField('')}
+        />
 
-      <TouchableOpacity style={styles.loginbtn} onPress={signIn}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
+        {/* Login Button */}
+        <TouchableOpacity style={styles.loginbtn} onPress={signIn}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
 
-      <Text>
-        Don't have an account? <Text style={{ color: '#6FB513' }}>Sign Up</Text>
-      </Text>
+        <Text>
+          Don't have an account?{' '}
+          <Text style={{ color: '#6FB513' }} onPress={() => navigation.navigate('SignUp')}>
+            Sign Up
+          </Text>
+        </Text>
 
-      {errorMessage ? (
-        <Text style={styles.errorText}>{errorMessage}</Text>
-      ) : null}
-    </SafeAreaView>
+        {/* ✅ Custom Modal */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={[styles.modalContent, isSuccess ? styles.successModal : styles.errorModal]}>
+              <Text style={styles.modalText}>{modalMessage}</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    
   );
 }
