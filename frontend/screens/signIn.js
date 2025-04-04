@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, Image, SafeAreaView, TouchableOpacity } from 'react-native';
-import { auth } from '../config/firebaseConfig';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import {
+  View,
+  TextInput,
+  Text,
+  Image,
+  SafeAreaView,
+  TouchableOpacity,
+} from 'react-native';
 import styles from '../styles/signInPageStyles';
 
-export default function SignIn() {
+import { signInUser } from '../backend/authService'; // ✅ your auth service
+
+export default function SignIn({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -14,8 +21,9 @@ export default function SignIn() {
 
   const signIn = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInUser(email, password); // ✅ now using the service
       console.log('User signed in!!');
+      navigation.navigate('SplashPage');
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -29,6 +37,7 @@ export default function SignIn() {
         resizeMode="contain"
       />
       <Text style={styles.titletext}>Login to your Account</Text>
+
       <TextInput
         style={[
           styles.input,
@@ -59,10 +68,14 @@ export default function SignIn() {
       <TouchableOpacity style={styles.loginbtn} onPress={signIn}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
-      <Text>Don't have an account? <Text style={{ color: '#6FB513' }}>Sign Up</Text></Text>
 
-      {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+      <Text>
+        Don't have an account? <Text style={{ color: '#6FB513' }}>Sign Up</Text>
+      </Text>
+
+      {errorMessage ? (
+        <Text style={styles.errorText}>{errorMessage}</Text>
+      ) : null}
     </SafeAreaView>
   );
 }
-

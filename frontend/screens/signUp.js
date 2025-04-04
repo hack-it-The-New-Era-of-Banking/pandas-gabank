@@ -8,11 +8,8 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
-import { auth } from '../config/firebaseConfig';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import styles from '../styles/signUpPageStyles';
-import { View, TextInput, Button, Text, StyleSheet, Image, SafeAreaView } from 'react-native';
-import { signUpUser } from '../backend/authService'; // Import the signUpUser function from authService
+import { signUpUser } from '../backend/authService'; 
 
 export default function SignUp() {
   const [firstName, setFirstName] = useState('');
@@ -33,7 +30,7 @@ export default function SignUp() {
 
     try {
       // Use the signUpUser function from authService
-      const userCredential = await signUpUser(email, password);
+      const userCredential = await signUpUser(email, firstName, lastName, mobile, password);
       console.log('🚀 User account created:', userCredential.user.email);
     } catch (error) {
       setErrorMessage(error.message);

@@ -2,21 +2,18 @@ import { auth, firestore } from '../config/firebaseConfig';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 
-// Helper to make email safe for Firestore document ID
-const makeSafeEmailId = (email) => email.replace(/\./g, '_').replace(/@/g, '_at_');
 
 // Function to handle user sign-up
-export const signUpUser = async (email, password) => {
+export const signUpUser = async (email, firstName, lastName, mobile, password) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    const safeEmail = email.replace(/\./g, '_').replace(/@/g, '_at_');
 
-    console.log('🚀 User created:', user.email);
-    console.log('🔥 Trying to save user in Firestore...');
-
-    await setDoc(doc(firestore, 'users', safeEmail), {
+    await setDoc(doc(firestore, 'users', email), {
       email: user.email,
+      firstName: firstName,
+      lastName: lastName,
+      mobile: mobile,
       createdAt: new Date(),
     }).then(() => {
       console.log('✅ User saved in Firestore successfully!');
