@@ -14,6 +14,8 @@ import GeminiTest from './screens/geminiTest';
 import PinSetup from './screens/pinSetup';
 import ConfirmPinSetup from './screens/confirmPinSetup';
 import DreamScreen from './screens/dreamScreen';
+import AddCard from './screens/addCard';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -28,9 +30,9 @@ export default function App() {
         <Stack.Screen name="HomePage" component={HomePage} options={{ headerShown: false }} />
         <Stack.Screen name="PinSetup" component={PinSetup} options={{ headerShown: false }} />
         <Stack.Screen name="ConfirmPinSetup" component={ConfirmPinSetup} options={{ headerShown: false }} />
-
         <Stack.Screen name="GeminiTest" component={GeminiTest} /> 
         <Stack.Screen name="DreamScreen" component={DreamScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="AddCard" component={AddCard} options={{ headerShown: false }} />
       </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>

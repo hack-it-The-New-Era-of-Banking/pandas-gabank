@@ -137,8 +137,9 @@ const HomePage = () => {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
+        <Header /> 
         <View style={styles.container}>
-          <Header /> {/* Use the Header component here */}
+          
 
           <FlatList
           ref={flatListRef}
