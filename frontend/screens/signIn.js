@@ -3,12 +3,15 @@ import {
   View,
   TextInput,
   Text,
+  StyleSheet,
   Image,
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
-import styles from '../styles/signInPageStyles';
-import { signInUser } from '../backend/userController';
+import styles from '../styles/signUpPageStyles';
+import { signInUser } from '../backend/userController'; // Assuming this is your sign-in service
+import { doc, getDoc } from 'firebase/firestore'; // Import Firestore functions
+import { firestore } from '../config/firebaseConfig'; // Assuming firestore is your Firestore instance
 
 export default function SignIn({ navigation }) {
   const [email, setEmail] = useState('');
@@ -20,10 +23,30 @@ export default function SignIn({ navigation }) {
 
   const signIn = async () => {
     try {
-      await signInUser(email, password); // ✅ now using the service
+      // Sign in the user
+      await signInUser(email, password);
       console.log('User signed in!!');
-      navigation.navigate('PinSetup');
+
+      // Check if the user has a PIN set by querying Firestore
+      const userDoc = await getDoc(doc(firestore, 'user', email));
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const hasPin = userData.Pin; // Assuming 'pin' field exists in user document
+
+        if (hasPin) {
+          // If user has a PIN, navigate to HomePage
+          navigation.navigate('HomePage');
+        } else {
+          // If user does not have a PIN, navigate to PinSetup
+          navigation.navigate('PinSetup');
+        }
+      } else {
+        console.error('User not found in Firestore.');
+        setErrorMessage('User not found.');
+      }
     } catch (error) {
+      console.error('Error signing in:', error.message);
       setErrorMessage(error.message);
     }
   };
