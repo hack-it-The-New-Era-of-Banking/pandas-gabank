@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet, Image, SafeAreaView } from 'react-native';
-import { auth } from '../config/firebaseConfig';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { signUpUser } from '../backend/authService'; // Import the signUpUser function from authService
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
@@ -13,8 +12,9 @@ export default function SignUp() {
 
   const signUp = async () => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      console.log('User account created!');
+      // Use the signUpUser function from authService
+      const userCredential = await signUpUser(email, password);
+      console.log('🚀 User account created:', userCredential.user.email);
     } catch (error) {
       setErrorMessage(error.message);
     }
