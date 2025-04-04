@@ -8,6 +8,8 @@ import LandingPage from './screens/landingPage';
 import SignUp from './screens/signUp';
 import SignIn from './screens/signIn';
 import GeminiTest from './screens/geminiTest';
+import PinSetup from './screens/pinSetup';
+import ConfirmPinSetup from './screens/confirmPinSetup.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,8 +21,10 @@ export default function App() {
         <Stack.Screen name="LandingPage" component={LandingPage} options={{ headerShown: false }} />
         <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }}/>
         <Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }}/>
+        <Stack.Screen name="GeminiTest" component={GeminiTest} /> 
+        <Stack.Screen name="PinSetup" component={PinSetup} options={{ headerShown: false }} />
+        <Stack.Screen name="ConfirmPinSetup" component={ConfirmPinSetup} options={{ headerShown: false }} />
 
-        <Stack.Screen name="GeminiTest" component={GeminiTest} /> *// This is the screen for testing the Gemini API
       </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
