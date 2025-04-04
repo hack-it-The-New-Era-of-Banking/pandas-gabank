@@ -3,11 +3,12 @@ import { StyleSheet, Text, View } from 'react-native';
 import SignUp from './screens/signUp';
 import SignIn from './screens/signIn';
 import SplashPage from './screens/splashPage';
+import LandingPage from './screens/landingPage';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <SplashPage></SplashPage>
+      <LandingPage></LandingPage>
       {/* <Text>Open up App.js to start working on your app!</Text> */}
       <StatusBar style="auto" />
     </View>
