@@ -23,7 +23,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="ManageCard">
+      <Stack.Navigator initialRouteName="SplashPage">
         <Stack.Screen name="SplashPage" component={SplashPage} options={{ headerShown: false }} />
         <Stack.Screen name="LandingPage" component={LandingPage} options={{ headerShown: false }} />
         <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }}/>

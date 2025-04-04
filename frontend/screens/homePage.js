@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -9,25 +9,21 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
-  Image
+  Image,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
-import { initializeApp, getApps } from "firebase/app";
-import { firebaseConfig } from "../config/firebaseConfig";
-import { LinearGradient } from 'expo-linear-gradient';
-import Header from '../components/header'; // Import the Header component
-// import BottomNavBar from '../components/bottomNavBar';
-if (!getApps().length) {
-  initializeApp(firebaseConfig);
-}
-const db = getFirestore();
+import { getUserCards } from "../backend/getCards";
+import { LinearGradient } from "expo-linear-gradient";
+import Header from "../components/header";
+
 const screenWidth = Dimensions.get("window").width;
 
 const HomePage = () => {
-  const [balanceCards, setBalanceCards] = useState([dummyUser]); // Start with dummy data
-  const [transactions, setTransactions] = useState(dummyTransactions); // Start with dummy data
+  const [balanceCards, setBalanceCards] = useState([]);
+  const [transactions, setTransactions] = useState(dummyTransactions);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const flatListRef = useRef(null);
 
   useEffect(() => {
     fetchUserData();
@@ -36,41 +32,75 @@ const HomePage = () => {
 
   const fetchUserData = async () => {
     try {
-      const userDocs = await getDocs(collection(db, "users"));
-      const users = [];
-      userDocs.forEach((doc) => {
-        const data = doc.data();
-        users.push({
-            id: doc.id,
-            balance: data.balance,
-            name: data.name,
-            contact: data.contact,
-            accountNumber: data.accountNumber || '',
-            expiryDate: data.expiryDate || '',
-            colorStart: data.colorStart || '#4CAF50',  // fallback if not set
-            colorEnd: data.colorEnd || '#1B5E20',
-          });
-          
-      });
-      console.log("Fetched users: ", users); // Log the fetched user data
-      setBalanceCards(users.length ? users : [dummyUser]); // Fallback to dummy data if no users
+      const cards = await getUserCards();
+      console.log("Fetched Cards: ", cards);
+
+      if (cards.length > 0) {
+        setBalanceCards(cards);
+      } else {
+        console.log("No cards found, using dummy data.");
+        setBalanceCards([dummyUser]);
+      }
     } catch (error) {
       console.error("Error fetching user data:", error);
-      setBalanceCards([dummyUser]); // Fallback to dummy data on error
+      setBalanceCards([dummyUser]);
     }
   };
 
   const fetchTransactions = async () => {
     try {
-      const transactionDocs = await getDocs(collection(db, "transactions"));
-      const transactionsArray = [];
-      transactionDocs.forEach((doc) => {
-        transactionsArray.push({ id: doc.id, ...doc.data() });
-      });
-      setTransactions(transactionsArray.length ? transactionsArray : dummyTransactions); // Fallback to dummy data if no transactions
+      setTransactions(dummyTransactions);
     } catch (error) {
       console.error("Error fetching transactions:", error);
-      setTransactions(dummyTransactions); // Fallback to dummy data on error
+    }
+  };
+
+  const renderCard = ({ item, index }) => {
+    try {
+      console.log("Rendering card:", item);
+
+      const gradientColors =
+        index === 0
+          ? ["#4CAF50", "#1B5E20"]
+          : [item.colorStart || "#4CAF50", item.colorEnd || "#1B5E20"];
+
+      return (
+        <LinearGradient colors={gradientColors} style={styles.card}>
+          <View style={styles.cardRow}>
+            <Text style={styles.cardTitle}>
+              {index === 0 ? "Current Balance" : "Your Balance"}
+            </Text>
+            <Text style={styles.bankName}>
+              {item.bankName ? item.bankName : index === 0 ? "GaBank" : "Unknown Bank"}
+            </Text>
+
+          </View>
+
+          <View style={styles.cardRow}>
+            <Text style={styles.cardBalance}>₱
+              {item.balance ? Number(item.balance).toFixed(2) : index === 0 ? 0.00 : 0.00}
+              </Text>
+          </View>
+
+          <View style={styles.cardRow}>
+            <Text style={styles.cardUserName}>
+            {item.name ? item.name : index === 0 ? "Juan Dela Cruz" : "N/A"}
+            </Text>
+          </View>
+
+          <View style={styles.cardRow}>
+            <Text style={styles.accountInfo}>
+            {item.cardNumber ? item.cardNumber : index === 0 ? "0000 0000 0000" : "N/A"}
+            </Text>
+            <Text style={styles.expiryDate}>
+              {index === 0 ? "" : item.expiryDate || ""}
+            </Text>
+          </View>
+        </LinearGradient>
+      );
+    } catch (err) {
+      console.error("Error rendering card:", err);
+      return null;
     }
   };
 
@@ -85,50 +115,10 @@ const HomePage = () => {
     </View>
   );
 
-  const renderCard = ({ item, index }) => {
-    const gradientColors =
-      index === 0
-        ? ["#4CAF50", "#1B5E20"] // Fixed gradient for the first card
-        : [item.colorStart || "#4CAF50", item.colorEnd || "#1B5E20"]; // User-defined or fallback
-  
-    return (
-      <LinearGradient colors={gradientColors} style={styles.card}>
-        <View style={styles.cardRow}>
-          <Text style={styles.cardTitle}>
-            {index === 0 ? "Current Balance" : "Your Balance"}
-          </Text>
-          <Text style={styles.bankName}>
-            {index === 0 ? "GaBank" : item.name}
-          </Text>
-        </View>
-  
-        <View style={styles.cardRow}>
-          <Text style={styles.cardBalance}>₱{item.balance}</Text>
-        </View>
-        <View style={styles.cardRow}>
-            <Text style={styles.cardUserName}>{item.name}</Text>
-        </View>
-        <View style={styles.cardRow}>
-          <Text style={styles.accountInfo}>
-            {index === 0 ? item.contact : item.accountNumber}
-          </Text>
-          <Text style={styles.expiryDate}>
-            {index === 0 ? "" : item.expiryDate}
-          </Text>
-        </View>
-      </LinearGradient>
-    );
-  };
-  
-  const flatListRef = React.useRef(null);
-
   const handleDotPress = (index) => {
     setCurrentIndex(index);
     flatListRef.current?.scrollToIndex({ animated: true, index });
   };
-  
-
-  
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -137,65 +127,70 @@ const HomePage = () => {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
-        <Header /> 
+        <Header />
         <View style={styles.container}>
-          
-
           <FlatList
-          ref={flatListRef}
+            ref={flatListRef}
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
-            data={balanceCards} // This will render either the fetched or dummy data
+            data={balanceCards}
             renderItem={renderCard}
             keyExtractor={(item) => item.id}
             contentContainerStyle={{ paddingVertical: 10 }}
             onMomentumScrollEnd={(e) => {
-                const contentOffsetX = e.nativeEvent.contentOffset.x;
-                const index = Math.floor(contentOffsetX / screenWidth); // Calculate the current index
-                setCurrentIndex(index); // Update the active index
+              const index = Math.floor(
+                e.nativeEvent.contentOffset.x / screenWidth
+              );
+              setCurrentIndex(index);
             }}
-            />
+          />
 
-          {/* Circle Indicators */}
           <View style={styles.dotContainer}>
             {balanceCards.map((_, index) => (
-                <TouchableOpacity
+              <TouchableOpacity
                 key={index}
                 style={[
-                    styles.dot,
-                    currentIndex === index && styles.activeDot,
+                  styles.dot,
+                  currentIndex === index && styles.activeDot,
                 ]}
                 onPress={() => handleDotPress(index)}
-                />
+              />
             ))}
-            </View>
-
-        {/* Option Boxes */}
-        <View style={styles.optionsContainer}>
-        <View style={styles.optionBox}>
-            <Image source={require('../assets/receive.png')} style={styles.optionIcon} />
-            <Text style={styles.optionText}>Receive</Text>
-        </View>
-            <View style={styles.optionBox}>
-            <Image source={require('../assets/save.png')} style={styles.optionIcon} />
-        <Text style={styles.optionText}>Save</Text>
-        </View>
-            <View style={styles.optionBox}>
-            <Image source={require('../assets/budget.png')} style={styles.optionIcon} />
-        <Text style={styles.optionText}>Budget</Text>
-        </View>
-
           </View>
+
+          <View style={styles.optionsContainer}>
+            <View style={styles.optionBox}>
+              <Image
+                source={require("../assets/receive.png")}
+                style={styles.optionIcon}
+              />
+              <Text style={styles.optionText}>Receive</Text>
+            </View>
+            <View style={styles.optionBox}>
+              <Image
+                source={require("../assets/save.png")}
+                style={styles.optionIcon}
+              />
+              <Text style={styles.optionText}>Save</Text>
+            </View>
+            <View style={styles.optionBox}>
+              <Image
+                source={require("../assets/budget.png")}
+                style={styles.optionIcon}
+              />
+              <Text style={styles.optionText}>Budget</Text>
+            </View>
+          </View>
+
           <Text style={styles.transactionListHead}>Your Transactions</Text>
           <FlatList
-            data={transactions} // This will render either the fetched or dummy data
+            data={transactions}
             renderItem={renderTransaction}
             keyExtractor={(item) => item.id}
             style={styles.transactionsList}
-          />          
+          />
         </View>
-        {/* <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} /> */}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -206,7 +201,6 @@ const dummyUser = {
   balance: "0.00",
   name: "User Name",
   contact: "0000 000 0000",
- 
 };
 
 const dummyTransactions = [
@@ -224,18 +218,29 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginRight: 10,
-    height: "90%",
+    height: 200, // Fixed height
   },
   cardRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
-    
   },
   cardTitle: { color: "#fff", fontSize: 14, marginBottom: 20 },
-  cardBalance: { fontSize: 32, fontWeight: "bold", color: "#fff", marginVertical:10 },
-  bankName: { fontSize: 16, color: "#fff", marginVertical:10},
-  cardUserName: { fontSize: 18, color: "#fff", marginVertical: 5, justifyContent: "flex-start", textAlign: "left", marginVertical:10 },
+  cardBalance: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#fff",
+    marginVertical: 10,
+  },
+  bankName: { fontSize: 16, color: "#fff", marginVertical: 10 },
+  cardUserName: {
+    fontSize: 18,
+    color: "#fff",
+    marginVertical: 5,
+    justifyContent: "flex-start",
+    textAlign: "left",
+    marginVertical: 10,
+  },
 
   accountInfo: { fontSize: 14, color: "#fff" },
   expiryDate: { fontSize: 14, color: "#fff" },
@@ -258,7 +263,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
 
-  // Circle Dot Indicators
   dotContainer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -275,14 +279,14 @@ const styles = StyleSheet.create({
   activeDot: {
     backgroundColor: "#4CAF50",
   },
+
   optionIcon: {
     width: 30,
     height: 30,
-    resizeMode: 'contain',
+    resizeMode: "contain",
     marginBottom: 5,
   },
-  
-  // Option Boxes
+
   optionsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -291,13 +295,11 @@ const styles = StyleSheet.create({
   optionBox: {
     alignItems: "center",
     justifyContent: "center",
-    
     padding: 20,
     borderRadius: 10,
     width: screenWidth / 3 - 30,
     borderWidth: 1,
-    border:1,
-    borderColor: "#023126"
+    borderColor: "#023126",
   },
   optionText: { fontSize: 14, color: "#4CAF50", marginTop: 10 },
 });

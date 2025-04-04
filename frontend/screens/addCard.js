@@ -3,15 +3,14 @@ import {
   View,
   TextInput,
   Text,
-  Image,
   SafeAreaView,
   KeyboardAvoidingView,
   TouchableOpacity,
   Platform
 } from 'react-native';
 import addCardStyles from '../styles/addCardStyles';
-import Header from '../components/header'; 
-import { signInUser } from '../backend/userController'; // ✅ your auth service
+import Header from '../components/header';
+import { addCard } from '../backend/addCard'; // ✅ use your Firestore card saving function
 
 export default function AddCard({ navigation }) {
   const [cardNumber, setcardNumber] = useState('');
@@ -25,11 +24,11 @@ export default function AddCard({ navigation }) {
   const [expiryDateFocused, setexpiryDateFocused] = useState(false);
   const [cvvFocused, setcvvFocused] = useState(false);
 
-  const signIn = async () => {
+  const handleAddCard = async () => {
     try {
-      await signInUser(cardNumber, bankName, expiryDate, cvv); // ✅ now using the service
-      console.log('Card Created!');
-      navigation.navigate('SplashPage');
+      await addCard(cardNumber, bankName, expiryDate, cvv);
+      console.log('✅ Card Created!');
+      navigation.navigate('HomePage'); // or any other screen you want
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -54,8 +53,6 @@ export default function AddCard({ navigation }) {
       >
         <Header />
         <View style={addCardStyles.container}>
-          
-
           <Text style={addCardStyles.titletext}>Add Card</Text>
 
           <TextInput
@@ -98,9 +95,7 @@ export default function AddCard({ navigation }) {
             onBlur={() => setexpiryDateFocused(false)}
           />
 
-       
-
-        <TextInput
+          <TextInput
             style={[
               addCardStyles.input,
               { borderBottomColor: cvvFocused ? '#6FB513' : '#ccc' },
@@ -114,7 +109,7 @@ export default function AddCard({ navigation }) {
             onBlur={() => setcvvFocused(false)}
           />
 
-          <TouchableOpacity style={addCardStyles.loginbtn} onPress={signIn}>
+          <TouchableOpacity style={addCardStyles.loginbtn} onPress={handleAddCard}>
             <Text style={addCardStyles.buttonText}>Add Card</Text>
           </TouchableOpacity>
 
