@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import styles from '../styles/signUpPageStyles';
-import { signUpUser } from '../backend/authService'; 
+import { signUpUser } from '../backend/userController'; 
 
 export default function SignUp() {
   const [firstName, setFirstName] = useState('');

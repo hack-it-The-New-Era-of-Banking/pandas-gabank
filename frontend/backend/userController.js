@@ -9,7 +9,7 @@ export const signUpUser = async (email, firstName, lastName, mobile, password) =
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    await setDoc(doc(firestore, 'users', email), {
+    await setDoc(doc(firestore, 'user', email), {
       email: user.email,
       firstName: firstName,
       lastName: lastName,
@@ -27,6 +27,8 @@ export const signUpUser = async (email, firstName, lastName, mobile, password) =
     throw error;
   }
 };
+
+// After signing up make a function that gets the PIN number that is associated to the email registered
 
 
 // Function to handle user sign-in

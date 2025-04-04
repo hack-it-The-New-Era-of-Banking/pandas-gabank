@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import styles from '../styles/signInPageStyles';
 
-import { signInUser } from '../backend/authService'; // ✅ your auth service
+import { signInUser } from '../backend/userController'; // ✅ your auth service
 
 export default function SignIn({ navigation }) {
   const [email, setEmail] = useState('');
