@@ -16,13 +16,15 @@ import { getUserCards } from "../backend/getCards";
 import { LinearGradient } from "expo-linear-gradient";
 import Header from "../components/header";
 
+import BottomNavBar from "../components/bottomNavBar";
+
 const screenWidth = Dimensions.get("window").width;
 
 const HomePage = ({ navigation }) => {
   const [balanceCards, setBalanceCards] = useState([]);
   const [transactions, setTransactions] = useState(dummyTransactions);
   const [currentIndex, setCurrentIndex] = useState(0);
-
+  const [activeTab, setActiveTab] = useState('Home'); // initial active tab
   const flatListRef = useRef(null);
 
   useEffect(() => {
@@ -180,12 +182,12 @@ const HomePage = ({ navigation }) => {
             {/* Bottom row centered */}
             <View style={styles.centeredRow}>
             <TouchableOpacity style={styles.optionBox} onPress={() => navigation.navigate("DreamScreen")}>
-                <Image source={require("../assets/budget.png")} style={styles.optionIcon} />
+                <Image source={require("../assets/cloud1.png")} style={styles.optionIcon} />
                 <Text style={styles.optionText}>Dream</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.optionBox} onPress={() => navigation.navigate("HomePage")}>
-                <Image source={require("../assets/budget.png")} style={styles.optionIcon} />
+                <Image source={require("../assets/assist.png")} style={styles.optionIcon} />
                 <Text style={styles.optionText}>Assist</Text>
             </TouchableOpacity>
             </View>
@@ -201,6 +203,8 @@ const HomePage = ({ navigation }) => {
           />
         </View>
       </KeyboardAvoidingView>
+
+      <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
     </SafeAreaView>
   );
 };
