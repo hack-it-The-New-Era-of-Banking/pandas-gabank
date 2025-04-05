@@ -11,31 +11,20 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import { saveSalary } from '../backend/budgetPlan.js'; // Ensure correct path to your backend file
+import { saveSalary } from '../backend/budgetPlan'; // Keep saveSalary function for saving data
+import { generateContent } from '../API/chatGenerator'; // Import the AI function
 import addCardStyles from '../styles/addCardStyles';
 import Header from '../components/header';
-import BottomNavBar from '../components/bottomNavBar';
+
 export default function BudgetMoney({ navigation }) {
   const [income, setIncome] = useState('');
   const [isWeekly, setIsWeekly] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [bankNameFocused, setbankNameFocused] = useState(false);
-const [activeTab, setActiveTab] = useState('Budget'); // initial active tab
+  const [budgetPlan, setBudgetPlan] = useState('');
+  const [loading, setLoading] = useState(false);  // Add loading state for AI call
+
   const parsedIncome = parseFloat(income) || 0;
   const period = isWeekly ? 'Weekly' : 'Monthly';
-
-  const breakdown = {
-    needs: parsedIncome * 0.5,
-    wants: parsedIncome * 0.3,
-    savings: parsedIncome * 0.2,
-  };
-
-  const budgetData = {
-    totalIncome: parsedIncome,
-    breakdown,
-    frequency: period,
-    createdAt: new Date().toISOString(),
-  };
 
   const handleSubmitIncome = async () => {
     if (!parsedIncome || parsedIncome <= 0) {
@@ -43,14 +32,33 @@ const [activeTab, setActiveTab] = useState('Budget'); // initial active tab
       return;
     }
 
+    setLoading(true);  // Show loading while waiting for AI response
     try {
-      // Call the saveSalary function to save the data to Firestore
-      await saveSalary(budgetData);
+      // First, save the salary data to your backend
+      await saveSalary({ totalIncome: parsedIncome, frequency: period });
 
-      console.log('Budget Data Saved:', budgetData);
-      setSubmitted(true); // Show the budget allocation breakdown after saving
+      console.log('Salary Data Saved:', parsedIncome);
+
+      // Send the entire prompt to the AI including the income and the budget breakdown request
+      const { success, generatedText, message } = await generateContent(
+        `Generate me a detailed budget plan for an income of ₱${income}. Calculate the following:
+        - 50% for needs
+        - 30% for wants
+        - 20% for savings.
+        Provide the breakdown and any additional recommendations for budgeting and saving. But Strictly Dont talk Like an AI. and remove unecessarry "*" or asterisks`
+      );
+
+      if (success) {
+        setBudgetPlan(generatedText);  // Set the AI-generated budget plan
+        setSubmitted(true);  // Mark that the budget has been generated
+      } else {
+        setBudgetPlan(message);  // Handle error response
+      }
     } catch (error) {
-      console.error('Error saving budget data:', error);
+      setBudgetPlan('Error generating or saving data, please try again.');
+      console.error(error);
+    } finally {
+      setLoading(false);  // Hide loading indicator after the request
     }
   };
 
@@ -74,16 +82,11 @@ const [activeTab, setActiveTab] = useState('Budget'); // initial active tab
 
             {/* Income Input */}
             <TextInput
-              style={[
-                addCardStyles.budgetinput,
-                { borderBottomColor: bankNameFocused ? '#6FB513' : '#ccc' },
-              ]}
+              style={addCardStyles.budgetinput}
               placeholder="Enter your income (₱)"
               keyboardType="numeric"
               value={income}
               onChangeText={setIncome}
-              onFocus={() => setbankNameFocused(true)}
-              onBlur={() => setbankNameFocused(false)}
               returnKeyType="done"
             />
 
@@ -92,23 +95,22 @@ const [activeTab, setActiveTab] = useState('Budget'); // initial active tab
               <Text style={addCardStyles.buttonText}>Generate Budget Plan</Text>
             </TouchableOpacity>
 
-            <Text style={addCardStyles.subtitleText}>Your Budget Plan</Text>
-            <View style={{ height: 1, backgroundColor: '#ccc', marginVertical: 10 }} />
-            {/* Show Breakdown */}
+            {/* Loading State */}
+            {loading && (
+              <Text style={addCardStyles.subtitleText}>Loading...</Text>
+            )}
+
+            {/* Show Breakdown or AI-generated Plan */}
             {submitted && (
               <View style={addCardStyles.budgetBox}>
                 <Text style={addCardStyles.budgetTitle}>{period} Budget Allocation</Text>
-                <Text style={addCardStyles.budgetLine}>💡 Total: ₱{parsedIncome.toFixed(2)}</Text>
-                <Text style={addCardStyles.budgetLine}>🧾 Needs (50%): ₱{breakdown.needs.toFixed(2)}</Text>
-                <Text style={addCardStyles.budgetLine}>🎉 Wants (30%): ₱{breakdown.wants.toFixed(2)}</Text>
-                <Text style={addCardStyles.budgetLine}>💰 Savings (20%): ₱{breakdown.savings.toFixed(2)}</Text>
+                <Text style={addCardStyles.budgetLine}>{budgetPlan}</Text>
               </View>
             )}
 
           </ScrollView>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-      <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
     </SafeAreaView>
   );
 }
