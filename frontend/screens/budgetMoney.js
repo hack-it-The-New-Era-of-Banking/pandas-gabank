@@ -36,15 +36,15 @@ export default function BudgetMoney({ navigation }) {
       await saveSalary({ totalIncome: parsedIncome, frequency: period });
 
       const { success, generatedText, message } = await generateContent(
-        `Generate me a detailed budget plan for an income of ₱${income}. Calculate the following:
+        `Generate a detailed budget plan for an income of ₱${income}. Calculate the following:
         - 50% for needs
         - 30% for wants
         - 20% for savings.
-        Provide the breakdown and any additional recommendations for budgeting and saving. But Strictly Dont talk Like an AI. and remove unnecessary "*" or asterisks.`
+        Provide the breakdown and any additional recommendations for budgeting and saving. But Strictly Dont talk Like an AI. and remove unnecessary "*" or asterisks. Start your text with "Hi I'm Gabot, I am here to assist you today!", don't use Alright as your opening`
       );
 
       if (success) {
-        setBudgetPlan(generatedText);
+        setBudgetPlan(formatBudgetResponse(generatedText));
         setSubmitted(true);
       } else {
         setBudgetPlan(message);
@@ -56,6 +56,31 @@ export default function BudgetMoney({ navigation }) {
       setLoading(false);
     }
   };
+
+  function formatBudgetResponse(rawText) {
+    const cleanText = rawText
+      .replace(/[\*﻿]+/g, '') 
+      .replace(/\u200B/g, '')
+      .replace(/\r/g, '')    
+      .trim();
+  
+    const lines = cleanText.split('\n').map((line) => {
+      const trimmed = line.trim();
+  
+      if (/^(Needs|Wants|Savings)\s*\(/i.test(trimmed)) {
+        return `• ${trimmed}`;
+      }
+  
+      if (/^(Rent|Utilities|Groceries|Transportation|Essential|Entertainment|Emergency|Investment|Medical|Food|Housing|Insurance|Debt)/i.test(trimmed)) {
+        return `  - ${trimmed}`;
+      }
+  
+      return trimmed;
+    });
+  
+    return lines.join('\n');
+  }
+  
 
   return (
     <KeyboardAvoidingView
@@ -99,7 +124,11 @@ export default function BudgetMoney({ navigation }) {
           {submitted && (
             <View style={[addCardStyles.budgetBox, { marginTop: 20 }]}>
               <Text style={addCardStyles.budgetTitle}>{period} Budget Allocation</Text>
-              <Text style={[addCardStyles.budgetLine, { whiteSpace: 'pre-line' }]}>{budgetPlan}</Text>
+              {budgetPlan.split('\n').map((line, index) => (
+                <Text key={index} style={addCardStyles.budgetLine}>
+                  {line}
+                </Text>
+              ))}
             </View>
           )}
         </ScrollView>
