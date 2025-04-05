@@ -13,6 +13,9 @@ import QRCode from 'react-native-qrcode-svg';
 import addCardStyles from '../styles/addCardStyles';
 import Header from '../components/header'; 
 import { signInUser } from '../backend/userController'; 
+import { firestore } from '../config/firebaseConfig'; 
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 export default function ReceiveMoney({ navigation }) {
   const [cardNumber, setCardNumber] = useState('');
@@ -31,22 +34,36 @@ export default function ReceiveMoney({ navigation }) {
 
   const handleReceiveMoney = async () => {
     try {
-      // Combine data to be encoded in the QR
-      const qrData = JSON.stringify({
+      const auth = getAuth();
+      const user = auth.currentUser;
+  
+      if (!user) {
+        setErrorMessage('User not logged in.');
+        return;
+      }
+  
+      const dataToSave = {
         cardNumber,
         bankName,
         amount,
-        sender
-      });
-
-      setQrValue(qrData); // Set data for QR code
-      setModalVisible(true); // Show modal
-
-      console.log('Money received!');
+        sender,
+        userEmail: user.email, 
+        createdAt: Timestamp.now()
+      };
+  
+      await addDoc(collection(firestore, 'receivedMoney'), dataToSave);
+  
+      setModalVisible(true);
+      setQrValue(JSON.stringify(dataToSave));
+      setErrorMessage('');
+      console.log('✅ Data saved with user email!');
     } catch (error) {
-      setErrorMessage(error.message);
+      console.error('❌ Error saving data:', error);
+      setErrorMessage('Failed to save data. Please try again.');
     }
   };
+  
+  
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
