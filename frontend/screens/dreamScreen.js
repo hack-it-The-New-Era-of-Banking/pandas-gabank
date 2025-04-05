@@ -13,7 +13,8 @@ import {
   SafeAreaView,
   Image,
   ActivityIndicator,
-  Alert,
+  Alert,ScrollView,
+  TouchableWithoutFeedback, Keyboard
 } from 'react-native';
 import { fetchDreams, addDreamWithImage } from '../backend/dreamController';
 import { firestore } from '../config/firebaseConfig';
@@ -272,123 +273,137 @@ const DreamScreen = () => {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
         <Header />
-        <View style={styles.container}>
-          <Text style={styles.titletext}>Create Dream</Text>
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <ScrollView contentContainerStyle={styles.container}>
           
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => setImageModalVisible(true)}
-          >
-            <Text style={styles.addButtonText}>Add Dream</Text>
-          </TouchableOpacity>
-          
-          <Text style={styles.listtitle}>Dream List</Text>
-          <FlatList
-            data={dreams}
-            keyExtractor={(item) => item.id}
-            renderItem={renderDreamItem}
-          />
-
-          {/* Dream With Image Modal */}
-          <Modal
-            visible={imageModalVisible}
-            animationType="slide"
-            transparent={true}
-            onRequestClose={() => setImageModalVisible(false)}
-          >
-            <KeyboardAvoidingView
-              style={styles.modalContainer}
-              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            <Text style={styles.titletext}>Create Dream</Text>
+            
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => setImageModalVisible(true)}
             >
-              <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Add a New Dream</Text>
-
-                <TextInput
-                  style={styles.input}
-                  placeholder="Goal Name"
-                  value={name}
-                  onChangeText={setName}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Max Progress"
-                  value={maxProgress}
-                  onChangeText={setMaxProgress}
-                  keyboardType="numeric"
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Current Progress"
-                  value={currentProgress}
-                  onChangeText={setCurrentProgress}
-                  keyboardType="numeric"
-                />
-
-                <Text style={styles.sectionTitle}>Generate an Image for Your Dream</Text>
-                <Text style={styles.helpText}>
-                  Click the button below to generate an inspirational image based on your goal name.
-                  Images must be under 1MB in size.
-                </Text>
-                
-                <Button 
-                  title="Generate Image" 
-                  onPress={generateImage} 
-                  disabled={loading || !name} 
-                />
-                
-                {loading && (
-                  <ActivityIndicator size="large" style={styles.loader} />
-                )}
-                
-                {imageUrl ? (
-                  <View>
-                    <View style={styles.generatedImageContainer}>
-                      <Image
-                        source={{ uri: imageUrl }}
-                        style={styles.generatedImage}
+              <Text style={styles.addButtonText}>Add Dream</Text>
+            </TouchableOpacity>
+            
+            <Text style={styles.listtitle}>Dream List</Text>
+            <FlatList
+              data={dreams}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View style={styles.dreamItem}>
+                  <Text style={styles.dreamName}>{item.name}</Text>
+                  {/* ... Other dream item details */}
+                  {item.imageUrl && (
+                    <View style={styles.dreamImageContainer}>
+                      <Image 
+                        source={{ uri: item.imageUrl }} 
+                        style={styles.dreamImage}
                         resizeMode="contain"
                       />
                     </View>
-                    <Text style={[
-                      styles.imageSizeText, 
-                      imageSize > MAX_IMAGE_SIZE ? styles.imageSizeError : null
-                    ]}>
-                      Image size: {(imageSize / 1024).toFixed(2)} KB
-                      {imageSize > MAX_IMAGE_SIZE ? ' (exceeds 1MB limit)' : ''}
-                    </Text>
-                  </View>
-                ) : null}
-                
-                {responseText ? (
-                  <View style={styles.textResponseContainer}>
-                    <Text style={styles.responseTextLabel}>AI response:</Text>
-                    <Text style={styles.responseText}>{responseText}</Text>
-                  </View>
-                ) : null}
-
-                {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
-
-                <View style={styles.modalButtons}>
-                  <Button 
-                    title="Add Dream" 
-                    onPress={handleAddDreamWithImage} 
-                    disabled={!imageUrl || imageSize > MAX_IMAGE_SIZE} 
-                  />
-                  <Button
-                    title="Cancel"
-                    color="red"
-                    onPress={() => {
-                      setImageModalVisible(false);
-                      setImageUrl('');
-                      setResponseText('');
-                      setImageSize(0);
-                    }}
-                  />
+                  )}
                 </View>
-              </View>
-            </KeyboardAvoidingView>
-          </Modal>
-        </View>
+              )}
+            />
+
+            {/* Dream With Image Modal */}
+            <Modal
+              visible={imageModalVisible}
+              animationType="slide"
+              transparent={true}
+              onRequestClose={() => setImageModalVisible(false)}
+            >
+              <KeyboardAvoidingView
+                style={styles.modalContainer}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+              >
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>Add a New Dream</Text>
+
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Goal Name"
+                    value={name}
+                    onChangeText={setName}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Max Progress"
+                    value={maxProgress}
+                    onChangeText={setMaxProgress}
+                    keyboardType="numeric"
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Current Progress"
+                    value={currentProgress}
+                    onChangeText={setCurrentProgress}
+                    keyboardType="numeric"
+                  />
+
+                  <Text style={styles.sectionTitle}>Generate an Image for Your Dream</Text>
+                  <Text style={styles.helpText}>
+                    Click the button below to generate an inspirational image based on your goal name.
+                    Images must be under 1MB in size.
+                  </Text>
+                  
+                  <Button 
+                    title="Generate Image" 
+                    onPress={() => generateImage()} 
+                    disabled={loading || !name} 
+                  />
+                  
+                  {loading && (
+                    <ActivityIndicator size="large" style={styles.loader} />
+                  )}
+                  
+                  {imageUrl ? (
+                    <View>
+                      <View style={styles.generatedImageContainer}>
+                        <Image
+                          source={{ uri: imageUrl }}
+                          style={styles.generatedImage}
+                          resizeMode="contain"
+                        />
+                      </View>
+                      <Text style={[styles.imageSizeText, imageSize > MAX_IMAGE_SIZE ? styles.imageSizeError : null]}>
+                        Image size: {(imageSize / 1024).toFixed(2)} KB
+                        {imageSize > MAX_IMAGE_SIZE ? ' (exceeds 1MB limit)' : ''}
+                      </Text>
+                    </View>
+                  ) : null}
+                  
+                  {responseText ? (
+                    <View style={styles.textResponseContainer}>
+                      <Text style={styles.responseTextLabel}>AI response:</Text>
+                      <Text style={styles.responseText}>{responseText}</Text>
+                    </View>
+                  ) : null}
+
+                  {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+
+                  <View style={styles.modalButtons}>
+                    <Button 
+                      title="Add Dream" 
+                      onPress={handleAddDreamWithImage} 
+                      disabled={!imageUrl || imageSize > MAX_IMAGE_SIZE} 
+                    />
+                    <Button
+                      title="Cancel"
+                      color="red"
+                      onPress={() => {
+                        setImageModalVisible(false);
+                        setImageUrl('');
+                        setResponseText('');
+                        setImageSize(0);
+                      }}
+                    />
+                  </View>
+                </View>
+              </KeyboardAvoidingView>
+            </Modal>
+          </ScrollView>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
       <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
     </SafeAreaView>
@@ -403,7 +418,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20 
   },
   addButton: {
-    backgroundColor: '#13B5B5',
+    backgroundColor: '#6FB513',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -525,13 +540,9 @@ const styles = StyleSheet.create({
   },
   textResponseContainer: {
     marginTop: 16,
-    padding: 10,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 5,
   },
   responseTextLabel: {
     fontWeight: 'bold',
-    marginBottom: 5,
   },
   responseText: {
     fontSize: 14,
@@ -547,8 +558,8 @@ const styles = StyleSheet.create({
   },
   dreamImage: {
     width: '100%',
-    height: '100%',
-  }
+    height: 200,
+  },
 });
 
 export default DreamScreen;
