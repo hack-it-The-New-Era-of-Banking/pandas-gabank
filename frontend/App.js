@@ -19,6 +19,7 @@ import ManageCard from './screens/manageCard';
 import ReceiveMoney from './screens/receiveMoney';
 import BudgetMoney from './screens/budgetMoney';
 import SaveMoney from './screens/saveMoney';
+import ImageGeneratorScreen from './screens/imageGeneratorScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -41,6 +42,7 @@ export default function App() {
         <Stack.Screen name="ReceiveMoney" component={ReceiveMoney} options={{ headerShown: false }} />
         <Stack.Screen name="BudgetMoney" component={BudgetMoney} options={{ headerShown: false }} />
         <Stack.Screen name="SaveMoney" component={SaveMoney} options={{ headerShown: false }} />
+        <Stack.Screen name="ImageGeneratorScreen" component={ImageGeneratorScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
