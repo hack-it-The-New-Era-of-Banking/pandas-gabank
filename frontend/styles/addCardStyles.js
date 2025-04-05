@@ -48,6 +48,15 @@ const addCardStyles = StyleSheet.create({
       fontWeight: '600',
       textAlign: 'center',
     },
+
+    subtitleText: {
+        fontSize: 16,
+        fontWeight: '400',
+        marginBottom: 20,
+        marginTop:15,
+        textAlign: 'center',
+        color: '403D3D',
+      },
   });
 
   export default addCardStyles;
