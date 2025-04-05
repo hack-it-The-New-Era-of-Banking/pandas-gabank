@@ -307,10 +307,33 @@ const DreamScreen = () => {
     return (
       <View style={styles.dreamItem}>
         <Text style={styles.dreamName}>{item.name}</Text>
-        <Text>Max Progress: {item.maxProgress}</Text>
-        <Text>Current Progress: {item.currentProgress}</Text>
         
-        {/* Show image if this dream has one */}
+        {/* Progress Section */}
+        <View style={styles.progressSection}>
+          <View style={styles.progressInfo}>
+            <Text style={styles.progressText}>
+              Progress: ₱ {item.currentProgress.toLocaleString()} / ₱ {item.maxProgress.toLocaleString()}
+            </Text>
+            <Text style={styles.progressPercentage}>
+              {Math.round((item.currentProgress / item.maxProgress) * 100)}%
+            </Text>
+          </View>
+          
+          {/* Progress Bar */}
+          <View style={styles.progressBarContainer}>
+            <View 
+              style={[
+                styles.progressBarFill, 
+                { 
+                  width: `${Math.min((item.currentProgress / item.maxProgress) * 100, 100)}%`,
+                  backgroundColor: (item.currentProgress / item.maxProgress) >= 1 ? '#4CAF50' : '#6FB513'
+                }
+              ]} 
+            />
+          </View>
+        </View>
+
+        {/* Dream Image */}
         {item.imageUrl && (
           <View style={styles.dreamImageContainer}>
             <Image 
@@ -346,23 +369,10 @@ const DreamScreen = () => {
             
             <Text style={styles.listtitle}>Dream List</Text>
             <FlatList
-              data={dreams}
+              data={[...dreams].reverse()}
               keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View style={styles.dreamItem}>
-                  <Text style={styles.dreamName}>{item.name}</Text>
-                  {/* ... Other dream item details */}
-                  {item.imageUrl && (
-                    <View style={styles.dreamImageContainer}>
-                      <Image 
-                        source={{ uri: item.imageUrl }} 
-                        style={styles.dreamImage}
-                        resizeMode="contain"
-                      />
-                    </View>
-                  )}
-                </View>
-              )}
+              renderItem={renderDreamItem}
+              contentContainerStyle={styles.dreamList}
             />
 
             {/* Dream With Image Modal */}
@@ -387,14 +397,14 @@ const DreamScreen = () => {
                   />
                   <TextInput
                     style={styles.input}
-                    placeholder="Max Progress"
+                    placeholder="Needed Amount"
                     value={maxProgress}
                     onChangeText={setMaxProgress}
                     keyboardType="numeric"
                   />
                   <TextInput
                     style={styles.input}
-                    placeholder="Current Progress"
+                    placeholder="Current Amount"
                     value={currentProgress}
                     onChangeText={setCurrentProgress}
                     keyboardType="numeric"
@@ -497,8 +507,14 @@ const styles = StyleSheet.create({
   },
   dreamItem: {
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginBottom: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4
   },
   titletext: {
     fontSize: 21,
@@ -528,6 +544,39 @@ const styles = StyleSheet.create({
   dreamName: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 12
+  },
+  progressSection: {
+    marginBottom: 12
+  },
+  progressInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8
+  },
+  progressText: {
+    fontSize: 14,
+    color: '#666'
+  },
+  progressPercentage: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6FB513'
+  },
+  progressBarContainer: {
+    height: 8,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 4,
+    overflow: 'hidden'
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 4
+  },
+  dreamList: {
+    padding: 16
   },
   modalContainer: {
     flex: 1,
@@ -614,17 +663,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   dreamImageContainer: {
-    marginTop: 10,
+    marginTop: 12,
     width: '100%',
     height: 150,
-    borderRadius: 5,
+    borderRadius: 8,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#eee',
+    backgroundColor: '#f5f5f5'
   },
   dreamImage: {
     width: '100%',
-    height: 200,
+    height: '100%'
   },
   compressionContainer: {
     flexDirection: 'row',
