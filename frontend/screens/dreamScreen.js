@@ -9,12 +9,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-
-import { addDream } from '../backend/dreamController';
-import { firestore } from '../config/firebaseConfig';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import { signInUser } from '../backend/userController';
+import { fetchDreams, addDream } from '../backend/dreamController';
 
 const DreamScreen = () => {
   const [dreams, setDreams] = useState([]);
@@ -24,33 +19,10 @@ const DreamScreen = () => {
   const [currentProgress, setCurrentProgress] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const auth = getAuth(); 
-  const email = auth.currentUser?.email; 
-  
-  signInUser("zyd@gmail.com", "123456")
-
   useEffect(() => {
-
-    if (!email) return;
-
-    const fetchDreams = () => {
-      const dreamCollection = collection(firestore, 'Dream');
-      const q = query(dreamCollection, where('email', '==', email));
-
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const dreamsData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setDreams(dreamsData);
-      });
-
-      return unsubscribe;
-    };
-
-    const unsubscribe = fetchDreams();
+    const unsubscribe = fetchDreams(setDreams);
     return () => unsubscribe();
-  }, [email]);
+  }, []);
 
   const handleAddDream = async () => {
     if (!name || !maxProgress || !currentProgress) {

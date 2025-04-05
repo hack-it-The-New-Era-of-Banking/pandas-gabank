@@ -1,6 +1,34 @@
 import { firestore } from '../config/firebaseConfig';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, addDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+
+/**
+ * Fetches all dreams for the authenticated user.
+ * @param {function} setDreams - A callback function to update the dreams state.
+ * @returns {function} - Unsubscribe function to stop listening to Firestore updates.
+ */
+export const fetchDreams = (setDreams) => {
+  const auth = getAuth();
+  const email = auth.currentUser?.email;
+
+  if (!email) {
+    console.error('User is not authenticated.');
+    return () => {};
+  }
+
+  const dreamCollection = collection(firestore, 'Dream');
+  const q = query(dreamCollection, where('email', '==', email));
+
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    const dreamsData = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setDreams(dreamsData);
+  });
+
+  return unsubscribe;
+};
 
 /**
  * Adds a new dream to the "Dream" collection for the authenticated user.
@@ -15,8 +43,8 @@ export const addDream = async (name, maxProgress, currentProgress) => {
       throw new Error('All fields (name, maxProgress, currentProgress) are required.');
     }
 
-    const auth = getAuth(); // Get the Firebase Auth instance
-    const email = auth.currentUser?.email; // Get the authenticated user's email
+    const auth = getAuth();
+    const email = auth.currentUser?.email;
 
     if (!email) {
       throw new Error('User is not authenticated.');
