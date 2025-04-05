@@ -160,7 +160,7 @@ const HomePage = ({ navigation }) => {
           </View>
 
           <View style={styles.optionsContainer}>
-            {/* Top Row (3 boxes) */}
+            {/* Top Row (3 options) */}
             <TouchableOpacity style={styles.optionBox} onPress={() => navigation.navigate("ReceiveMoney")}>
                 <Image source={require("../assets/receive.png")} style={styles.optionIcon} />
                 <Text style={styles.optionText}>Receive</Text>
@@ -171,24 +171,25 @@ const HomePage = ({ navigation }) => {
                 <Text style={styles.optionText}>Save</Text>
             </TouchableOpacity>
 
-            <View style={styles.optionBox}>
+            <TouchableOpacity style={styles.optionBox} onPress={() => navigation.navigate("BudgetMoney")}>
                 <Image source={require("../assets/budget.png")} style={styles.optionIcon} />
                 <Text style={styles.optionText}>Budget</Text>
+            </TouchableOpacity>
             </View>
 
-            {/* Bottom Row (2 boxes centered) */}
+            {/* Bottom row centered */}
             <View style={styles.centeredRow}>
-                <View style={styles.optionBox}>
+            <TouchableOpacity style={styles.optionBox} onPress={() => navigation.navigate("DreamScreen")}>
                 <Image source={require("../assets/budget.png")} style={styles.optionIcon} />
                 <Text style={styles.optionText}>Dream</Text>
-                </View>
+            </TouchableOpacity>
 
-                <View style={styles.optionBox}>
+            <TouchableOpacity style={styles.optionBox} onPress={() => navigation.navigate("HomePage")}>
                 <Image source={require("../assets/budget.png")} style={styles.optionIcon} />
                 <Text style={styles.optionText}>Assist</Text>
-                </View>
+            </TouchableOpacity>
             </View>
-            </View>
+
 
 
           <Text style={styles.transactionListHead}>Your Transactions</Text>
