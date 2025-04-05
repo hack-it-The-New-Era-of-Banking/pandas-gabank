@@ -42,7 +42,6 @@ export default function ReceiveMoney({ navigation }) {
       setQrValue(qrData); // Set data for QR code
       setModalVisible(true); // Show modal
 
-      await signInUser(cardNumber, bankName, amount, sender);
       console.log('Money received!');
     } catch (error) {
       setErrorMessage(error.message);
