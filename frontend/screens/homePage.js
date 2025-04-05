@@ -186,7 +186,7 @@ const HomePage = ({ navigation }) => {
                 <Text style={styles.optionText}>Dream</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.optionBox} onPress={() => navigation.navigate("HomePage")}>
+            <TouchableOpacity style={styles.optionBox} onPress={() => navigation.navigate("ChatBot")}>
                 <Image source={require("../assets/assist.png")} style={styles.optionIcon} />
                 <Text style={styles.optionText}>Assist</Text>
             </TouchableOpacity>
