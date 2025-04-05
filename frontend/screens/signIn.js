@@ -30,11 +30,6 @@ export default function SignIn({ navigation }) {
       await signInUser(email, password);
       console.log('User signed in!!');
   
-      // Show the modal first (immediately)
-      setModalMessage('Login Successful!');
-      setIsSuccess(true);
-      setModalVisible(true);
-  
       // Wait for 2 seconds to show the modal before navigating
       setTimeout(async () => {
         // Check if the user has a PIN set by querying Firestore
@@ -54,11 +49,8 @@ export default function SignIn({ navigation }) {
           }
         } else {
           console.error('User not found in Firestore.');
-          setModalMessage('User not found.');
-          setIsSuccess(false);
-          setModalVisible(true);
         }
-      }, 2000); // 2 seconds delay before checking Firestore and navigating
+      }, 0); 
     } catch (error) {
       console.error('Error signing in:', error.message);
       setErrorMessage(error.message);
@@ -126,25 +118,6 @@ export default function SignIn({ navigation }) {
           </Text>
         </Text>
 
-        {/* ✅ Custom Modal */}
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={[styles.modalContent, isSuccess ? styles.successModal : styles.errorModal]}>
-              <Text style={styles.modalText}>{modalMessage}</Text>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={styles.closeButtonText}>OK</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
         </KeyboardAvoidingView>
       </SafeAreaView>
     

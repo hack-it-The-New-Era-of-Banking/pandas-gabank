@@ -15,10 +15,11 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { getUserCards } from "../backend/getCards";
 import { LinearGradient } from "expo-linear-gradient";
 import Header from "../components/header";
+import ReceiveMoney from "./receiveMoney";
 
 const screenWidth = Dimensions.get("window").width;
 
-const HomePage = () => {
+const HomePage = ({ navigation }) => {
   const [balanceCards, setBalanceCards] = useState([]);
   const [transactions, setTransactions] = useState(dummyTransactions);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -79,18 +80,18 @@ const HomePage = () => {
           <View style={styles.cardRow}>
             <Text style={styles.cardBalance}>₱
               {item.balance ? Number(item.balance).toFixed(2) : index === 0 ? 0.00 : 0.00}
-              </Text>
+            </Text>
           </View>
 
           <View style={styles.cardRow}>
             <Text style={styles.cardUserName}>
-            {item.name ? item.name : index === 0 ? "Juan Dela Cruz" : "N/A"}
+              {item.name ? item.name : index === 0 ? "Juan Dela Cruz" : "N/A"}
             </Text>
           </View>
 
           <View style={styles.cardRow}>
             <Text style={styles.accountInfo}>
-            {item.cardNumber ? item.cardNumber : index === 0 ? "0000 0000 0000" : "N/A"}
+              {item.cardNumber ? item.cardNumber : index === 0 ? "0000 0000 0000" : "N/A"}
             </Text>
             <Text style={styles.expiryDate}>
               {index === 0 ? "" : item.expiryDate || ""}
@@ -160,13 +161,13 @@ const HomePage = () => {
           </View>
 
           <View style={styles.optionsContainer}>
-            <View style={styles.optionBox}>
+            <TouchableOpacity style={styles.optionBox} onPress={() => navigation.navigate("ReceiveMoney")}>
               <Image
                 source={require("../assets/receive.png")}
                 style={styles.optionIcon}
               />
               <Text style={styles.optionText}>Receive</Text>
-            </View>
+            </TouchableOpacity>
             <View style={styles.optionBox}>
               <Image
                 source={require("../assets/save.png")}

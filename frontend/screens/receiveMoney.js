@@ -3,12 +3,13 @@ import {
   View,
   TextInput,
   Text,
-  Image,
   SafeAreaView,
   KeyboardAvoidingView,
   TouchableOpacity,
+  Modal,
   Platform
 } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
 import addCardStyles from '../styles/addCardStyles';
 import Header from '../components/header'; 
 import { signInUser } from '../backend/userController'; 
@@ -25,11 +26,24 @@ export default function ReceiveMoney({ navigation }) {
   const [amountFocused, setAmountFocused] = useState(false);
   const [senderFocused, setSenderFocused] = useState(false);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [qrValue, setQrValue] = useState('');
+
   const handleReceiveMoney = async () => {
     try {
-      await signInUser(cardNumber, bankName, amount, sender); 
+      // Combine data to be encoded in the QR
+      const qrData = JSON.stringify({
+        cardNumber,
+        bankName,
+        amount,
+        sender
+      });
+
+      setQrValue(qrData); // Set data for QR code
+      setModalVisible(true); // Show modal
+
+      await signInUser(cardNumber, bankName, amount, sender);
       console.log('Money received!');
-      navigation.navigate('SplashPage');
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -104,6 +118,42 @@ export default function ReceiveMoney({ navigation }) {
           {errorMessage ? (
             <Text style={addCardStyles.errorText}>{errorMessage}</Text>
           ) : null}
+
+          <Modal
+            visible={modalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'rgba(0,0,0,0.5)'
+            }}>
+              <View style={{
+                width: 300,
+                padding: 20,
+                backgroundColor: 'white',
+                borderRadius: 10,
+                alignItems: 'center'
+              }}>
+                <Text style={{ fontSize: 18, marginBottom: 10, fontWeight: 800 }}>Generated QR</Text>
+                <QRCode value={qrValue} size={200} />
+                <TouchableOpacity
+                  onPress={() => setModalVisible(false)}
+                  style={{
+                    marginTop: 20,
+                    backgroundColor: '#6FB513',
+                    padding: 10,
+                    borderRadius: 8,
+                  }}
+                >
+                  <Text style={{ color: '#fff' }}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
