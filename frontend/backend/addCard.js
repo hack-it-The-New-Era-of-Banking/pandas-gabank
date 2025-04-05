@@ -1,7 +1,7 @@
 import { auth, firestore } from '../config/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 
-export const addCard = async (cardNumber, bankName, expiryDate, CVV) => {
+export const addCard = async (cardNumber, bankName, expiryDate, CVV, balance) => {
   try {
     const currentUser = auth.currentUser;
 
@@ -18,6 +18,7 @@ export const addCard = async (cardNumber, bankName, expiryDate, CVV) => {
       bankName,
       expiryDate,
       CVV,
+      balance,
       createdAt: new Date(),
     });
 

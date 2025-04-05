@@ -17,6 +17,7 @@ export default function AddCard({ navigation }) {
   const [bankName, setbankName] = useState('');
   const [expiryDate, setexpiryDate] = useState('');
   const [cvv, setcvv] = useState('');
+  const [balance, setBalance] = useState((Math.random() * (25000 - 5000) + 5000).toFixed(2));
   const [errorMessage, setErrorMessage] = useState('');
 
   const [cardNumberFocused, setcardNumberFocused] = useState(false);
@@ -26,7 +27,7 @@ export default function AddCard({ navigation }) {
 
   const handleAddCard = async () => {
     try {
-      await addCard(cardNumber, bankName, expiryDate, cvv);
+      await addCard(cardNumber, bankName, expiryDate, cvv, balance);
       console.log('✅ Card Created!');
       navigation.navigate('HomePage'); // or any other screen you want
     } catch (error) {
