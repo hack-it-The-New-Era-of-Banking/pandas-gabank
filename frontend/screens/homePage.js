@@ -160,28 +160,37 @@ const HomePage = ({ navigation }) => {
           </View>
 
           <View style={styles.optionsContainer}>
+            {/* Top Row (3 options) */}
             <TouchableOpacity style={styles.optionBox} onPress={() => navigation.navigate("ReceiveMoney")}>
-              <Image
-                source={require("../assets/receive.png")}
-                style={styles.optionIcon}
-              />
-              <Text style={styles.optionText}>Receive</Text>
+                <Image source={require("../assets/receive.png")} style={styles.optionIcon} />
+                <Text style={styles.optionText}>Receive</Text>
             </TouchableOpacity>
+
             <TouchableOpacity style={styles.optionBox} onPress={() => navigation.navigate("SaveMoney")}>
-              <Image
-                source={require("../assets/save.png")}
-                style={styles.optionIcon}
-              />
-              <Text style={styles.optionText}>Save</Text>
+                <Image source={require("../assets/save.png")} style={styles.optionIcon} />
+                <Text style={styles.optionText}>Save</Text>
             </TouchableOpacity>
-            <View style={styles.optionBox}>
-              <Image
-                source={require("../assets/budget.png")}
-                style={styles.optionIcon}
-              />
-              <Text style={styles.optionText}>Budget</Text>
+
+            <TouchableOpacity style={styles.optionBox} onPress={() => navigation.navigate("BudgetMoney")}>
+                <Image source={require("../assets/budget.png")} style={styles.optionIcon} />
+                <Text style={styles.optionText}>Budget</Text>
+            </TouchableOpacity>
             </View>
-          </View>
+
+            {/* Bottom row centered */}
+            <View style={styles.centeredRow}>
+            <TouchableOpacity style={styles.optionBox} onPress={() => navigation.navigate("DreamScreen")}>
+                <Image source={require("../assets/budget.png")} style={styles.optionIcon} />
+                <Text style={styles.optionText}>Dream</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.optionBox} onPress={() => navigation.navigate("HomePage")}>
+                <Image source={require("../assets/budget.png")} style={styles.optionIcon} />
+                <Text style={styles.optionText}>Assist</Text>
+            </TouchableOpacity>
+            </View>
+
+
 
           <Text style={styles.transactionListHead}>Your Transactions</Text>
           <FlatList
@@ -219,6 +228,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 10,
     height: 200, // Fixed height
+    marginBottom: 30,
   },
   cardRow: {
     flexDirection: "row",
@@ -267,7 +277,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     marginVertical: 0,
-    marginTop: -15,
+    marginTop: 5,
   },
   dot: {
     width: 10,
@@ -281,26 +291,35 @@ const styles = StyleSheet.create({
   },
 
   optionIcon: {
-    width: 30,
-    height: 30,
+    width: 25,
+    height: 25,
     resizeMode: "contain",
     marginBottom: 5,
   },
-
+  centeredRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    width: "100%",
+    gap: 20, // optional spacing between the two
+  },
+  
   optionsContainer: {
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "space-between",
-    marginTop: 20,
+    marginTop: 5,
   },
   optionBox: {
     alignItems: "center",
     justifyContent: "center",
-    padding: 20,
+    padding: 15,
     borderRadius: 10,
-    width: screenWidth / 3 - 30,
+    width: screenWidth / 3.7, // Smaller box
+    marginBottom: 15,
     borderWidth: 1,
     borderColor: "#023126",
   },
+  
   optionText: { fontSize: 14, color: "#4CAF50", marginTop: 10 },
 });
 

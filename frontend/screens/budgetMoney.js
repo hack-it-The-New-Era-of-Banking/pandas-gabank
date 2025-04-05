@@ -6,12 +6,12 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  Switch,
   TouchableOpacity,
   ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
+import { saveSalary } from '../backend/budgetPlan.js'; // Ensure correct path to your backend file
 import addCardStyles from '../styles/addCardStyles';
 import Header from '../components/header';
 
@@ -37,10 +37,21 @@ export default function BudgetMoney({ navigation }) {
     createdAt: new Date().toISOString(),
   };
 
-  const handleSubmitIncome = () => {
-    if (!parsedIncome || parsedIncome <= 0) return;
-    console.log('Budget Data Ready:', budgetData);
-    setSubmitted(true);
+  const handleSubmitIncome = async () => {
+    if (!parsedIncome || parsedIncome <= 0) {
+      console.log('Invalid income value');
+      return;
+    }
+
+    try {
+      // Call the saveSalary function to save the data to Firestore
+      await saveSalary(budgetData);
+
+      console.log('Budget Data Saved:', budgetData);
+      setSubmitted(true); // Show the budget allocation breakdown after saving
+    } catch (error) {
+      console.error('Error saving budget data:', error);
+    }
   };
 
   return (
@@ -80,18 +91,7 @@ export default function BudgetMoney({ navigation }) {
             <TouchableOpacity style={addCardStyles.genbutton} onPress={handleSubmitIncome}>
               <Text style={addCardStyles.buttonText}>Generate Budget Plan</Text>
             </TouchableOpacity>
-            
-            {/* Toggle Monthly/Weekly */}
-            {/* <View style={addCardStyles.toggleContainer}>
-              <Text style={addCardStyles.toggleLabel}>View as {period} Budget</Text>
-              <Switch
-                value={isWeekly}
-                onValueChange={() => setIsWeekly(prev => !prev)}
-                style={{ marginLeft: 10 }}
-                trackColor={{ false: '#ccc', true: '#6FB513' }}
-                thumbColor="#fff"
-              />
-            </View> */}
+
             <Text style={addCardStyles.subtitleText}>Your Budget Plan</Text>
             <View style={{ height: 1, backgroundColor: '#ccc', marginVertical: 10 }} />
             {/* Show Breakdown */}
@@ -105,15 +105,6 @@ export default function BudgetMoney({ navigation }) {
               </View>
             )}
 
-            {/* Add Expense Button */}
-            {submitted && (
-              <TouchableOpacity
-                style={addCardStyles.addButton}
-                onPress={() => console.log("Add Expense tapped!")}
-              >
-                <Text style={addCardStyles.addButtonText}>➕ Add Expense</Text>
-              </TouchableOpacity>
-            )}
           </ScrollView>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
