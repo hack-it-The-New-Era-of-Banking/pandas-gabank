@@ -102,15 +102,8 @@ export default function BudgetMoney({ navigation }) {
               </View>
             )}
 
-            {/* Add Expense Button */}
-            {submitted && (
-              <TouchableOpacity
-                style={addCardStyles.addButton}
-                onPress={() => console.log("Add Expense tapped!")}
-              >
-                <Text style={addCardStyles.addButtonText}>➕ Add Expense</Text>
-              </TouchableOpacity>
-            )}
+        
+            
           </ScrollView>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
