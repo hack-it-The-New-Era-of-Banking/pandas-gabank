@@ -12,6 +12,7 @@ import {
 import QRCode from 'react-native-qrcode-svg';
 import addCardStyles from '../styles/addCardStyles';
 import Header from '../components/header'; 
+import BottomNavBar from '../components/bottomNavBar'; 
 import { signInUser } from '../backend/userController'; 
 import { firestore } from '../config/firebaseConfig'; 
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
@@ -23,6 +24,7 @@ export default function ReceiveMoney({ navigation }) {
   const [amount, setAmount] = useState('');
   const [sender, setSender] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [activeTab, setActiveTab] = useState('Receive'); // initial active tab
 
   const [cardNumberFocused, setCardNumberFocused] = useState(false);
   const [bankNameFocused, setBankNameFocused] = useState(false);
@@ -171,7 +173,9 @@ export default function ReceiveMoney({ navigation }) {
             </View>
           </Modal>
         </View>
+        
       </KeyboardAvoidingView>
+      <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
     </SafeAreaView>
   );
 }

@@ -42,7 +42,7 @@ export default function SignIn({ navigation }) {
           // Navigate based on PIN status
           if (hasPin) {
             // If user has a PIN, navigate to HomePage
-            navigation.navigate('HomePage');
+            navigation.navigate('DreamScreen');
           } else {
             // If user does not have a PIN, navigate to PinSetup
             navigation.navigate('PinSetup');

@@ -12,7 +12,7 @@ import addCardStyles from '../styles/addCardStyles';
 import Header from '../components/header';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { auth, firestore } from '../config/firebaseConfig';
-
+import BottomNavBar from '../components/bottomNavBar'; 
 
 
 export default function SaveMoney({ navigation }) {
@@ -21,7 +21,7 @@ export default function SaveMoney({ navigation }) {
   const [amount, setAmount] = useState('');
   const [allocatedArea, setAllocatedArea] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
+const [activeTab, setActiveTab] = useState('Save'); // initial active tab
   const [cardNumberFocused, setCardNumberFocused] = useState(false);
   const [bankNameFocused, setBankNameFocused] = useState(false);
   const [amountFocused, setAmountFocused] = useState(false);
@@ -133,6 +133,7 @@ export default function SaveMoney({ navigation }) {
           ) : null}
         </View>
       </KeyboardAvoidingView>
+      <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
     </SafeAreaView>
   );
 }
