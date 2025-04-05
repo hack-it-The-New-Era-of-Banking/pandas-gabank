@@ -23,6 +23,7 @@ import { getAuth } from 'firebase/auth';
 import { signInUser } from '../backend/userController';
 import Header from '../components/header';
 import * as FileSystem from 'expo-file-system';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
 // Maximum allowed image size in bytes (1MB)
 const MAX_IMAGE_SIZE = 1000000;
@@ -41,6 +42,7 @@ const DreamScreen = () => {
   const [imageSize, setImageSize] = useState(0);
   const [responseText, setResponseText] = useState('');
   const [loading, setLoading] = useState(false);
+  const [compressing, setCompressing] = useState(false);
 
   const [activeTab, setActiveTab] = useState('Dream'); // initial active tab
   useEffect(() => {
@@ -209,24 +211,79 @@ const DreamScreen = () => {
     }
   };
 
+  // Compress image to be under MAX_IMAGE_SIZE (1MB)
+  const compressImage = async (imageUri) => {
+    setCompressing(true);
+    try {
+      // Extract base64 data from the data URL
+      const base64Data = imageUri.split('base64,')[1];
+      
+      // Save to temporary file
+      const tempUri = FileSystem.documentDirectory + 'temp_image.jpg';
+      await FileSystem.writeAsStringAsync(
+        tempUri,
+        base64Data,
+        { encoding: FileSystem.EncodingType.Base64 }
+      );
+
+      // Start with moderate compression
+      let quality = 0.5;
+      let result = await manipulateAsync(
+        tempUri,
+        [{ resize: { width: 512 } }],
+        { compress: quality, format: SaveFormat.JPEG }
+      );
+
+      // Read the compressed image
+      let compressedBase64 = await FileSystem.readAsStringAsync(
+        result.uri,
+        { encoding: FileSystem.EncodingType.Base64 }
+      );
+      
+      // If still too large, compress more aggressively
+      if (calculateImageSize(compressedBase64) > MAX_IMAGE_SIZE) {
+        quality = 0.3;
+        result = await manipulateAsync(
+          tempUri,
+          [{ resize: { width: 512 } }],
+          { compress: quality, format: SaveFormat.JPEG }
+        );
+        compressedBase64 = await FileSystem.readAsStringAsync(
+          result.uri,
+          { encoding: FileSystem.EncodingType.Base64 }
+        );
+      }
+
+      // Clean up
+      await FileSystem.deleteAsync(tempUri, { idempotent: true });
+      
+      const compressedImageUri = `data:image/jpeg;base64,${compressedBase64}`;
+      setCompressing(false);
+      return compressedImageUri;
+    } catch (error) {
+      console.error("Error compressing image:", error);
+      setCompressing(false);
+      throw error;
+    }
+  };
+
   const handleAddDreamWithImage = async () => {
     if (!name || !maxProgress || !currentProgress || !imageUrl) {
       setErrorMessage('All fields including image are required.');
       return;
     }
-    
-    // Check image size again before saving
-    if (imageSize > MAX_IMAGE_SIZE) {
-      setErrorMessage(`Image is too large (${(imageSize/1024/1024).toFixed(2)}MB). Please generate a smaller image (max 1MB).`);
-      return;
-    }
 
     try {
+      setLoading(true);
+      
+      // Always compress the image before saving
+      const compressedImageUrl = await compressImage(imageUrl);
+      
       await addDreamWithImage(
         name, 
         parseInt(maxProgress), 
         parseInt(currentProgress), 
-        imageUrl,
+        compressedImageUrl,
         name // Using the goal name as the prompt text
       );
       
@@ -240,6 +297,8 @@ const DreamScreen = () => {
       setImageSize(0);
     } catch (error) {
       setErrorMessage(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -399,6 +458,13 @@ const DreamScreen = () => {
                       }}
                     />
                   </View>
+
+                  {compressing && (
+                    <View style={styles.compressionContainer}>
+                      <ActivityIndicator size="small" color="#13B5B5" />
+                      <Text style={styles.compressionText}>Optimizing image...</Text>
+                    </View>
+                  )}
                 </View>
               </KeyboardAvoidingView>
             </Modal>
@@ -559,6 +625,17 @@ const styles = StyleSheet.create({
   dreamImage: {
     width: '100%',
     height: 200,
+  },
+  compressionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  compressionText: {
+    marginLeft: 8,
+    color: '#13B5B5',
+    fontSize: 14,
   },
 });
 
