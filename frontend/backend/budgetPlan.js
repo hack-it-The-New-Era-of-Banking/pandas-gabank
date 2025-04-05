@@ -1,7 +1,8 @@
+// budgetPlan.js
 import { auth, firestore } from '../config/firebaseConfig'; // Adjust if needed
 import { doc, setDoc } from 'firebase/firestore';
 
-const saveSalary = async (salary) => {
+export const saveSalary = async (salary) => {
   try {
     const user = auth.currentUser; // Get the current logged-in user
     if (!user) {
@@ -10,11 +11,11 @@ const saveSalary = async (salary) => {
     }
 
     const userEmail = user.email; // Get user's email
-    const salaryRef = doc(firestore, 'Salary', userEmail); // Reference to the document using the user's email
-
+    const salaryRef = doc(firestore, 'Salary', userEmail);
+    
     // Set the salary in the Firestore document
     await setDoc(salaryRef, {
-      salary: salary, // Save the salary in the document field
+      salary: salary,
     });
 
     console.log('Salary saved successfully!');

@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import { saveSalary } from '../backend/budgetPlan'; // Assuming you have the saveSalary function in a backend file
+import { saveSalary } from '../backend/budgetPlan.js'; // Ensure correct path to your backend file
 import addCardStyles from '../styles/addCardStyles';
 import Header from '../components/header';
 
@@ -38,12 +38,15 @@ export default function BudgetMoney({ navigation }) {
   };
 
   const handleSubmitIncome = async () => {
-    if (!parsedIncome || parsedIncome <= 0) return;
+    if (!parsedIncome || parsedIncome <= 0) {
+      console.log('Invalid income value');
+      return;
+    }
 
     try {
       // Call the saveSalary function to save the data to Firestore
       await saveSalary(budgetData);
-      
+
       console.log('Budget Data Saved:', budgetData);
       setSubmitted(true); // Show the budget allocation breakdown after saving
     } catch (error) {
@@ -102,8 +105,6 @@ export default function BudgetMoney({ navigation }) {
               </View>
             )}
 
-        
-            
           </ScrollView>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
