@@ -10,6 +10,10 @@ import {
 } from 'react-native';
 import addCardStyles from '../styles/addCardStyles';
 import Header from '../components/header';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { auth, firestore } from '../config/firebaseConfig';
+
+
 
 export default function SaveMoney({ navigation }) {
   const [cardNumber, setCardNumber] = useState('');
@@ -25,12 +29,38 @@ export default function SaveMoney({ navigation }) {
 
   const handleSaveMoney = async () => {
     try {
-      // You can implement saving logic here (e.g., Firebase save)
-      console.log('Money saved!');
+      const user = auth.currentUser;
+  
+      if (!user) {
+        setErrorMessage('No user logged in.');
+        return;
+      }
+  
+      const dataToSave = {
+        cardNumber,
+        bankName,
+        amount,
+        allocatedArea,
+        email: user.email, 
+        createdAt: Timestamp.now()
+      };
+  
+      await addDoc(collection(firestore, 'savedMoney'), dataToSave);
+      setErrorMessage('');
+      console.log('✅ Money saved successfully!');
+      
+      // Optionally clear inputs
+      setCardNumber('');
+      setBankName('');
+      setAmount('');
+      setAllocatedArea('');
+      
     } catch (error) {
-      setErrorMessage(error.message);
+      console.error('❌ Error saving money:', error);
+      setErrorMessage('Failed to save money. Please try again.');
     }
   };
+  
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
