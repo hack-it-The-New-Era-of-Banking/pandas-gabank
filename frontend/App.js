@@ -10,6 +10,7 @@ import LandingPage from './screens/landingPage';
 import SignUp from './screens/signUp';
 import SignIn from './screens/signIn';
 import HomePage from './screens/homePage';
+import ChatPage from './screens/chat';
 import GeminiTest from './screens/geminiTest';
 import PinSetup from './screens/pinSetup';
 import ConfirmPinSetup from './screens/confirmPinSetup';
@@ -33,6 +34,7 @@ export default function App() {
         <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }}/>
         <Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }}/>
         <Stack.Screen name="HomePage" component={HomePage} options={{ headerShown: false }} />
+        <Stack.Screen name="ChatPage" component={ChatPage} options={{ headerShown: false }} />
         <Stack.Screen name="PinSetup" component={PinSetup} options={{ headerShown: false }} />
         <Stack.Screen name="ConfirmPinSetup" component={ConfirmPinSetup} options={{ headerShown: false }} />
         <Stack.Screen name="GeminiTest" component={GeminiTest} /> 
