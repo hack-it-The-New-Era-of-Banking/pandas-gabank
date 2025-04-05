@@ -15,7 +15,6 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { getUserCards } from "../backend/getCards";
 import { LinearGradient } from "expo-linear-gradient";
 import Header from "../components/header";
-import ReceiveMoney from "./receiveMoney";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -168,13 +167,13 @@ const HomePage = ({ navigation }) => {
               />
               <Text style={styles.optionText}>Receive</Text>
             </TouchableOpacity>
-            <View style={styles.optionBox}>
+            <TouchableOpacity style={styles.optionBox} onPress={() => navigation.navigate("SaveMoney")}>
               <Image
                 source={require("../assets/save.png")}
                 style={styles.optionIcon}
               />
               <Text style={styles.optionText}>Save</Text>
-            </View>
+            </TouchableOpacity>
             <View style={styles.optionBox}>
               <Image
                 source={require("../assets/budget.png")}
