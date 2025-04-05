@@ -8,8 +8,16 @@ import {
   Modal,
   StyleSheet,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
 } from 'react-native';
 import { fetchDreams, addDream } from '../backend/dreamController';
+import { firestore } from '../config/firebaseConfig';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { signInUser } from '../backend/userController';
+import Header from '../components/header';
 
 const DreamScreen = () => {
   const [dreams, setDreams] = useState([]);
@@ -20,9 +28,30 @@ const DreamScreen = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    const unsubscribe = fetchDreams(setDreams);
+    const auth = getAuth();
+    const email = auth.currentUser?.email;
+  
+    if (!email) return;
+  
+    const fetchDreams = () => {
+      const dreamCollection = collection(firestore, 'Dream');
+      const q = query(dreamCollection, where('email', '==', email));
+  
+      const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
+        const dreamsData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setDreams(dreamsData);
+      });
+  
+      return unsubscribeSnapshot;
+    };
+  
+    const unsubscribe = fetchDreams();
     return () => unsubscribe();
   }, []);
+  
 
   const handleAddDream = async () => {
     if (!name || !maxProgress || !currentProgress) {
@@ -43,79 +72,98 @@ const DreamScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+          >
+        <Header />
+        <View style={styles.container}>
+          
+      <Text style={styles.titletext}>Create Dream</Text>
       <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => setModalVisible(true)}
-      >
-        <Text style={styles.addButtonText}>Add Dream</Text>
-      </TouchableOpacity>
+            style={styles.addButton}
+            onPress={() => setModalVisible(true)}
+          >
+            <Text style={styles.addButtonText}>Add Dream</Text>
+          </TouchableOpacity>
+      <Text style={styles.listtitle}>Dream List</Text>
+          <FlatList
+            data={dreams}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View style={styles.dreamItem}>
+                <Text style={styles.dreamName}>{item.name}</Text>
+                <Text>Max Progress: {item.maxProgress}</Text>
+                <Text>Current Progress: {item.currentProgress}</Text>
+              </View>
+            )}
+          />
 
-      <FlatList
-        data={dreams}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.dreamItem}>
-            <Text style={styles.dreamName}>{item.name}</Text>
-            <Text>Max Progress: {item.maxProgress}</Text>
-            <Text>Current Progress: {item.currentProgress}</Text>
-          </View>
-        )}
-      />
 
-      <Modal
-        visible={modalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add a New Dream</Text>
+          <Modal
+            visible={modalVisible}
+            animationType="slide"
+            transparent={true}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <KeyboardAvoidingView
+              style={styles.modalContainer}
+              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            >
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Add a New Dream</Text>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Goal Name"
-              value={name}
-              onChangeText={setName}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Max Progress"
-              value={maxProgress}
-              onChangeText={setMaxProgress}
-              keyboardType="numeric"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Current Progress"
-              value={currentProgress}
-              onChangeText={setCurrentProgress}
-              keyboardType="numeric"
-            />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Goal Name"
+                  value={name}
+                  onChangeText={setName}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Max Progress"
+                  value={maxProgress}
+                  onChangeText={setMaxProgress}
+                  keyboardType="numeric"
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Current Progress"
+                  value={currentProgress}
+                  onChangeText={setCurrentProgress}
+                  keyboardType="numeric"
+                />
 
-            {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+                {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-            <View style={styles.modalButtons}>
-              <Button title="Add Dream" onPress={handleAddDream} />
-              <Button
-                title="Cancel"
-                color="red"
-                onPress={() => setModalVisible(false)}
-              />
-            </View>
-          </View>
+                <View style={styles.modalButtons}>
+                  <Button title="Add Dream" onPress={handleAddDream} />
+                  <Button
+                    title="Cancel"
+                    color="red"
+                    onPress={() => setModalVisible(false)}
+                  />
+                </View>
+              </View>
+            </KeyboardAvoidingView>
+          </Modal>
+
+          
+
         </View>
-      </Modal>
-    </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#fff',
+  container: { 
+    flex: 1, 
+    backgroundColor: "#fff", 
+    marginHorizontal: 30, 
+    paddingVertical: 20 
   },
   addButton: {
     backgroundColor: '#6FB513',
@@ -133,6 +181,31 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+  },
+  titletext: {
+    fontSize: 21,
+    fontWeight: '800',
+    marginBottom: 20,
+    marginTop: 20,
+    textAlign: 'center',
+    color: '#403D3D',
+  },
+  subtitle: {
+    fontSize: 16,
+    fontWeight: '400',
+    marginBottom: 20,
+    marginTop: 5,
+    textAlign: 'center',
+    color: '#403D3D',
+  },
+  listtitle: {
+    fontSize: 16,
+    fontWeight: '400',
+    marginBottom: 5,
+    marginTop: 5,
+    textAlign: 'left',
+    color: '#403D3D',
+    paddingLeft: '12'
   },
   dreamName: {
     fontSize: 18,
