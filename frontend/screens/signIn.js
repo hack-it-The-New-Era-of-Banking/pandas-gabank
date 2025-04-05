@@ -31,7 +31,7 @@ export default function SignIn({ navigation }) {
       console.log('User signed in!!');
   
       // Show the modal first (immediately)
-      setModalMessage('Login Successful! 🎉');
+      setModalMessage('Login Successful!');
       setIsSuccess(true);
       setModalVisible(true);
   
