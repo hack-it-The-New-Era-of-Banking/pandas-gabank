@@ -24,7 +24,7 @@ export default function ReceiveMoney({ navigation }) {
   const [amount, setAmount] = useState('');
   const [sender, setSender] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [activeTab, setActiveTab] = useState('Home'); // initial active tab
+  const [activeTab, setActiveTab] = useState('Receive'); // initial active tab
 
   const [cardNumberFocused, setCardNumberFocused] = useState(false);
   const [bankNameFocused, setBankNameFocused] = useState(false);

@@ -25,6 +25,7 @@ import * as FileSystem from 'expo-file-system';
 
 // Maximum allowed image size in bytes (1MB)
 const MAX_IMAGE_SIZE = 1000000;
+import BottomNavBar from '../components/bottomNavBar';
 
 const DreamScreen = () => {
   const [dreams, setDreams] = useState([]);
@@ -40,6 +41,7 @@ const DreamScreen = () => {
   const [responseText, setResponseText] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const [activeTab, setActiveTab] = useState('Dream'); // initial active tab
   useEffect(() => {
     const auth = getAuth();
     const email = auth.currentUser?.email;
@@ -388,6 +390,7 @@ const DreamScreen = () => {
           </Modal>
         </View>
       </KeyboardAvoidingView>
+      <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
     </SafeAreaView>
   );
 };

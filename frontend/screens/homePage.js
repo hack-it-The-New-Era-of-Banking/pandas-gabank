@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 10,
     height: 200, // Fixed height
-    marginBottom: 30,
+    marginBottom: 260,
   },
   cardRow: {
     flexDirection: "row",
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
 
   transactionListHead: {
     fontSize: 16,
-    marginTop: 15,
+    marginTop: 5,
   },
 
   dotContainer: {

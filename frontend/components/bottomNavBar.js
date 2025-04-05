@@ -10,7 +10,7 @@ const BottomNavBar = ({ activeTab, setActiveTab }) => {
     { name: 'Receive', icon: require('../assets/receive.png'), screen: 'ReceiveMoney' },
     { name: 'Dream', icon: require('../assets/dream.png'), screen: 'DreamScreen' }, // center
     { name: 'Save', icon: require('../assets/save.png'), screen: 'SaveMoney' },
-    { name: 'Profile', icon: require('../assets/budget.png'), screen: 'BudgetMoney' },
+    { name: 'Budget', icon: require('../assets/budget.png'), screen: 'BudgetMoney' },
   ];
 
   return (

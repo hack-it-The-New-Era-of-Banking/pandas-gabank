@@ -14,13 +14,13 @@ import {
 import { saveSalary } from '../backend/budgetPlan.js'; // Ensure correct path to your backend file
 import addCardStyles from '../styles/addCardStyles';
 import Header from '../components/header';
-
+import BottomNavBar from '../components/bottomNavBar';
 export default function BudgetMoney({ navigation }) {
   const [income, setIncome] = useState('');
   const [isWeekly, setIsWeekly] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [bankNameFocused, setbankNameFocused] = useState(false);
-
+const [activeTab, setActiveTab] = useState('Budget'); // initial active tab
   const parsedIncome = parseFloat(income) || 0;
   const period = isWeekly ? 'Weekly' : 'Monthly';
 
@@ -108,6 +108,7 @@ export default function BudgetMoney({ navigation }) {
           </ScrollView>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
+      <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
     </SafeAreaView>
   );
 }
